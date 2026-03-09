@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useSpring, Variants } from 'framer-motion';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import {
   Sparkles,
   ChefHat,
@@ -24,6 +25,7 @@ import {
 type NavItem = {
   label: string;
   href: string;
+  isRoute?: boolean;
 };
 
 // --- Animations ---
@@ -86,6 +88,7 @@ const Logo: React.FC<{ light?: boolean; white?: boolean }> = ({ light = false, w
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -100,6 +103,7 @@ const Header: React.FC = () => {
     { label: 'Menu', href: '#menu' },
     { label: 'Events', href: '#events' },
     { label: 'Testimonials', href: '#testimonials' },
+    { label: 'Portfolio', href: '/portfolio', isRoute: true },
   ];
 
   return (
@@ -111,20 +115,31 @@ const Header: React.FC = () => {
       transition={{ duration: 0.6, ease: 'circOut' }}
     >
       <div className="container mx-auto px-6 flex justify-between items-center">
-        <a href="#" className="hover:opacity-80 transition-opacity duration-300 origin-left cursor-pointer">
-          <Logo light={false} />
-        </a>
+        <Link to="/" className="hover:opacity-80 transition-opacity duration-300 origin-left cursor-pointer">
+          <Logo light={false} white={!isScrolled && location.pathname === '/portfolio'} />
+        </Link>
 
         <nav className="hidden md:flex gap-8 items-center font-sans">
           {navItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`text-sm font-medium transition-colors hover:text-brand-cta relative group ${isScrolled ? 'text-gray-600' : 'text-gray-800'}`}
-            >
-              {item.label}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cta transition-all duration-300 group-hover:w-full"></span>
-            </a>
+            item.isRoute ? (
+              <Link
+                key={item.label}
+                to={item.href}
+                className={`text-sm font-medium transition-colors hover:text-brand-cta relative group ${isScrolled ? 'text-gray-600' : (location.pathname === '/portfolio' ? 'text-white' : 'text-gray-800')}`}
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cta transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            ) : (
+              <a
+                key={item.label}
+                href={item.href}
+                className={`text-sm font-medium transition-colors hover:text-brand-cta relative group ${isScrolled ? 'text-gray-600' : (location.pathname === '/portfolio' ? 'text-white' : 'text-gray-800')}`}
+              >
+                {item.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cta transition-all duration-300 group-hover:w-full"></span>
+              </a>
+            )
           ))}
           <GlassButton className="ml-4 !px-6 !py-2.5 text-sm">
             Book Now
@@ -133,7 +148,7 @@ const Header: React.FC = () => {
 
         {/* Mobile Menu Icon */}
         <button className="md:hidden text-brand-primary p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-          <Menu className="w-6 h-6" />
+          <Menu className={`w-6 h-6 ${!isScrolled && location.pathname === '/portfolio' ? 'text-white' : 'text-brand-primary'}`} />
         </button>
       </div>
     </motion.header>
@@ -1288,18 +1303,36 @@ const Footer: React.FC = () => {
   );
 };
 
+// Lazy load Portfolio for code splitting
+const Portfolio = React.lazy(() => import('./Portfolio'));
+
+const HomePage: React.FC = () => (
+  <>
+    <Hero />
+    <ImageMarquee />
+    <FoodFoundation />
+    <Process />
+    <UseCases />
+    <ExperiencePreview />
+    <Testimonials />
+  </>
+);
+
 const App: React.FC = () => {
   return (
     <div className="min-h-screen bg-brand-background font-sans selection:bg-brand-cta/30 selection:text-brand-primary antialiased">
       <Header />
       <main>
-        <Hero />
-        <ImageMarquee />
-        <FoodFoundation />
-        <Process />
-        <UseCases />
-        <ExperiencePreview />
-        <Testimonials />
+        <React.Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="animate-pulse text-brand-primary font-serif text-2xl">Loading...</div>
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/portfolio" element={<Portfolio />} />
+          </Routes>
+        </React.Suspense>
       </main>
       <Footer />
     </div>
