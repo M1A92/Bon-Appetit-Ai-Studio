@@ -203,10 +203,12 @@ const DifferenceSlide = () => {
 
 const AutoSliderSlide = () => {
     const images = [
-        "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2000&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2000&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1543286386-713bdd548da4?q=80&w=2000&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2000&auto=format&fit=crop"
+        "/Assets/Website Bilder/Bon Appetit Website-7.jpg",
+        "/Assets/Website Bilder/Bon Appetit Website-21.jpg",
+        "/Assets/Website Bilder/Bon Appetit Website-42.jpg",
+        "/Assets/Website Bilder/Bon Appetit Website-43.jpg",
+        "/Assets/Website Bilder/Bon Appetit Website-45.jpg",
+        "/Assets/Website Bilder/Bon Appetit Website-50.jpg"
     ];
 
     const [currentImage, setCurrentImage] = useState(0);
