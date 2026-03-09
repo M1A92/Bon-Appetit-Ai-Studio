@@ -5,6 +5,8 @@ import {
     ChefHat,
     ChevronDown,
     ChevronUp,
+    ChevronLeft,
+    ChevronRight,
     Target,
     Leaf,
     Users,
@@ -212,16 +214,25 @@ const AutoSliderSlide = () => {
     ];
 
     const [currentImage, setCurrentImage] = useState(0);
+    const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
     useEffect(() => {
+        if (!isAutoPlaying) return;
         const timer = setInterval(() => {
             setCurrentImage((prev) => (prev + 1) % images.length);
-        }, 3000);
+        }, 4000);
         return () => clearInterval(timer);
-    }, []);
+    }, [isAutoPlaying]);
+
+    const handleManualNav = (index: number) => {
+        setCurrentImage(index);
+        setIsAutoPlaying(false);
+        // Resume autoplay after 10 seconds of inactivity
+        setTimeout(() => setIsAutoPlaying(true), 10000);
+    };
 
     return (
-        <SlideWrapper id="slide-4" className="p-0">
+        <SlideWrapper id="slide-4" className="p-0 group">
             <div className="absolute inset-0">
                 <AnimatePresence mode="wait">
                     <motion.img
@@ -230,18 +241,38 @@ const AutoSliderSlide = () => {
                         initial={{ opacity: 0, scale: 1.1 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 1.5, ease: "easeInOut" }}
+                        transition={{ duration: 1.2, ease: "easeInOut" }}
                         className="w-full h-full object-cover"
                     />
                 </AnimatePresence>
-                <div className="absolute inset-x-0 bottom-20 flex justify-center gap-3 z-10">
+
+                {/* Navigation Arrows */}
+                <div className="absolute inset-x-8 top-1/2 -translate-y-1/2 flex justify-between z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <button
+                        onClick={() => handleManualNav((currentImage - 1 + images.length) % images.length)}
+                        className="p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all"
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                        onClick={() => handleManualNav((currentImage + 1) % images.length)}
+                        className="p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 transition-all"
+                    >
+                        <ChevronRight className="w-6 h-6" />
+                    </button>
+                </div>
+
+                {/* Pagination Dots */}
+                <div className="absolute inset-x-0 bottom-20 flex justify-center gap-4 z-20">
                     {images.map((_, i) => (
-                        <div
+                        <button
                             key={i}
-                            className={`h-1 rounded-full transition-all duration-500 ${currentImage === i ? "w-12 bg-white" : "w-4 bg-white/40"}`}
+                            onClick={() => handleManualNav(i)}
+                            className={`h-1.5 rounded-full transition-all duration-500 ${currentImage === i ? "w-12 bg-white" : "w-4 bg-white/40 hover:bg-white/70"}`}
                         />
                     ))}
                 </div>
+
                 <div className="absolute inset-0 bg-black/10"></div>
             </div>
         </SlideWrapper>
@@ -415,6 +446,34 @@ const CulinarySlide = () => {
     );
 };
 
+const PortfolioFooter = () => (
+    <section id="slide-11" className="snap-start min-h-[400px] w-full bg-gradient-to-br from-brand-primary to-brand-secondary py-20 text-white relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
+                <div className="col-span-1 md:col-span-2">
+                    <img src="/Assets/white logo.png" alt="Bon Appétit AI Studio" className="h-16 w-auto object-contain brightness-110 mb-8" />
+                    <p className="text-white/80 font-light max-w-sm leading-relaxed">
+                        Redefining luxury hospitality through advanced artificial intelligence and culinary excellence.
+                    </p>
+                </div>
+                <div>
+                    <h4 className="font-bold uppercase tracking-widest text-[10px] text-brand-cta mb-8">Direct Lines</h4>
+                    <p className="text-sm font-bold text-white mb-2">+971 6 7044091</p>
+                    <p className="text-sm font-bold text-white">+971 50 5634392</p>
+                </div>
+                <div>
+                    <h4 className="font-bold uppercase tracking-widest text-[10px] text-brand-cta mb-8">Studio</h4>
+                    <p className="text-sm text-white/80 font-light mb-2">Dubai Design District, UAE</p>
+                    <p className="text-sm text-white/80 font-light">concierge@bonappetit.ai</p>
+                </div>
+            </div>
+            <div className="pt-8 border-t border-white/10 text-center">
+                <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/40">© 2024 Bon Appétit AI Studio. All rights reserved.</p>
+            </div>
+        </div>
+    </section>
+);
+
 const ThankYouSlide = () => (
     <SlideWrapper id="slide-10" className="bg-white text-brand-secondary relative">
         <div className="absolute inset-0 z-0 opacity-5">
@@ -528,7 +587,7 @@ const Portfolio: React.FC = () => {
         <div className="h-screen overflow-y-auto scroll-smooth snap-y snap-mandatory scrollbar-hide bg-brand-background">
             {/* Navigation Indicators */}
             <div className="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3">
-                {[...Array(10)].map((_, i) => (
+                {[...Array(11)].map((_, i) => (
                     <a
                         key={i}
                         href={`#slide-${i + 1}`}
@@ -539,7 +598,7 @@ const Portfolio: React.FC = () => {
 
             {/* Slide Counter */}
             <div className="fixed bottom-6 right-6 z-50 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 text-[10px] font-bold text-brand-secondary tracking-widest uppercase">
-                Slide {activeSlide + 1} / 10
+                Slide {activeSlide + 1} / 11
             </div>
 
             <CoverSlide />
@@ -552,6 +611,7 @@ const Portfolio: React.FC = () => {
             <PartnershipsSlide />
             <CulinarySlide />
             <ThankYouSlide />
+            <PortfolioFooter />
 
             <style>{`
         .scrollbar-hide::-webkit-scrollbar {

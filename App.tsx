@@ -1334,7 +1334,7 @@ const App: React.FC = () => {
           </Routes>
         </React.Suspense>
       </main>
-      <Footer />
+      {location.pathname !== '/portfolio' && <Footer />}
     </div>
   );
 };
