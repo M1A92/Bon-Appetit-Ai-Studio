@@ -20,7 +20,8 @@ import {
     Phone,
     Mail,
     Instagram,
-    Globe
+    Globe,
+    ExternalLink
 } from 'lucide-react';
 
 // --- Components ---
@@ -507,7 +508,18 @@ const Portfolio: React.FC = () => {
         const slides = document.querySelectorAll('section[id^="slide-"]');
         slides.forEach((slide) => observer.observe(slide));
 
-        return () => observer.disconnect();
+        // Disable global scrollbar on mount
+        const originalHtmlOverflow = document.documentElement.style.overflow;
+        const originalBodyOverflow = document.body.style.overflow;
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            observer.disconnect();
+            // Restore global scrollbar on unmount
+            document.documentElement.style.overflow = originalHtmlOverflow;
+            document.body.style.overflow = originalBodyOverflow;
+        };
     }, []);
 
     return (
@@ -541,11 +553,13 @@ const Portfolio: React.FC = () => {
 
             <style>{`
         .scrollbar-hide::-webkit-scrollbar {
-          display: none;
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
         }
         .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+          -ms-overflow-style: none !important;
+          scrollbar-width: none !important;
         }
         html {
           scroll-behavior: smooth;
